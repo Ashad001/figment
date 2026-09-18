@@ -1,0 +1,37 @@
+<!doctype html>
+<meta charset="utf-8" />
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 0; padding: 12px;
+         background: #1e1e1e; color: #e6e6e6; }
+  header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  h1 { font-size: 13px; margin: 0; flex: 1; font-family: system-ui, sans-serif; }
+  button { font: inherit; padding: 5px 12px; border-radius: 7px; border: 0; cursor: pointer;
+           background: #f5f5f5; color: #111; }
+  pre { white-space: pre-wrap; word-break: break-word; margin: 0 0 10px; }
+  textarea { width: 100%; height: 320px; box-sizing: border-box; background: #141414;
+             color: #cfcfcf; border: 1px solid #333; border-radius: 8px; padding: 8px;
+             font: inherit; resize: vertical; }
+</style>
+<header>
+  <h1>Design Sync</h1>
+  <button id="copy">Copy</button>
+  <button id="close">Close</button>
+</header>
+<pre id="log">Working…</pre>
+<textarea id="out" placeholder="Design-system dump appears here"></textarea>
+<script>
+  const log = document.getElementById('log');
+  const out = document.getElementById('out');
+  onmessage = (e) => {
+    const m = e.data.pluginMessage;
+    if (!m) return;
+    if (m.type === 'log') log.textContent = m.text;
+    if (m.type === 'dump') { out.value = m.text; log.textContent = 'Design system dumped — press Copy.'; }
+  };
+  document.getElementById('copy').onclick = () => {
+    const text = out.value || log.textContent;
+    out.value = text; out.select(); document.execCommand('copy');
+  };
+  document.getElementById('close').onclick = () => parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
+</script>

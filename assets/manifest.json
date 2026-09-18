@@ -1,0 +1,13 @@
+{
+  "name": "Design Sync",
+  "id": "design-sync-plugin",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "menu": [
+    { "name": "Build the screens", "command": "build" },
+    { "name": "Dump this file's design system", "command": "dump" }
+  ],
+  "networkAccess": { "allowedDomains": ["none"] }
+}
