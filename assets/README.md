@@ -1,4 +1,4 @@
-# Design Sync — a local Figma plugin scaffold
+# Figment — the plugin scaffold
 
 Generates a design system, components, illustrations and screens into whatever Figma file you
 run it in. Copy this folder into your repo (`tools/figma-plugin/` is a good home) and start
@@ -14,7 +14,7 @@ Then, in the **Figma desktop app** (a manifest plugin will not load in the brows
 
 1. Open the file you want to build into — any file you can edit; a fresh one is fine.
 2. Plugins → Development → **Import plugin from manifest…** → pick `manifest.json`
-3. Plugins → Development → **Design Sync → Build the screens**
+3. Plugins → Development → **Figment → Build the screens**
 
 Re-running replaces the screens in place and reuses the tokens and components, so it never
 forks the design system or stacks duplicates.

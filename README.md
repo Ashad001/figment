@@ -1,8 +1,13 @@
-# figma-plugin-pipeline
+# Figment
 
-An agent skill for generating and iterating on Figma design — a design system, a component
-library, illustrations and complete screens — straight from code, using a local Figma plugin
-plus an offline harness that catches layout bugs before Figma is ever opened.
+**Design Figma files from code. Without opening Figma.**
+
+Figment is an agent skill for generating and iterating on real Figma design — a design
+system, a component library, illustrations and complete screens — straight from a codebase.
+It drives a local Figma plugin, and ships an offline layout engine that catches overflow,
+clipping and overlap before the canvas is ever opened.
+
+So the agent designs blind, and is still right.
 
 ## Why
 
@@ -30,8 +35,8 @@ auto-layout engine, and fails the build on anything that would overflow, clip or
 ## Install
 
 ```bash
-git clone https://github.com/Ashad001/figma-plugin-pipeline.git
-cp -r figma-plugin-pipeline ~/.claude/skills/figma-plugin-pipeline
+git clone https://github.com/Ashad001/figment.git
+cp -r figment ~/.claude/skills/figment
 ```
 
 It then triggers on its own for requests like "build these screens in Figma", "push our

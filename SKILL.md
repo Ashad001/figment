@@ -1,8 +1,8 @@
 ---
-name: figma-plugin-pipeline
+name: figment
 description: >
-  Build and iterate on a Figma design system, component library, illustrations and complete
-  screens straight from code, using a local Figma plugin plus an offline harness that catches
+  Figment builds and iterates on a Figma design system, component library, illustrations and
+  complete screens straight from code, using a local Figma plugin plus an offline harness that catches
   layout bugs before Figma is ever opened. Use this whenever someone wants design generated
   into Figma from a codebase, a token file or a spec — "build these screens in Figma", "push
   our design system / tokens to Figma", "generate a component library in Figma", "make a

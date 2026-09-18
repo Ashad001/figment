@@ -1,6 +1,6 @@
 {
-  "name": "Design Sync",
-  "id": "design-sync-plugin",
+  "name": "Figment",
+  "id": "figment-plugin",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
