@@ -71,6 +71,22 @@ function makeNode(type) {
     return n.clone();
   };
 
+  // Plugin data is a string store on any node; the runner keeps the file's project label on the
+  // document. Like the real API: '' for a key never set, and only strings may be stored.
+  const pluginData = Object.create(null);
+  n.getPluginData = function (key) { return pluginData[key] || ''; };
+  n.setPluginData = function (key, value) {
+    if (typeof value !== 'string') throw new Error('setPluginData("' + key + '"): value must be a string, got ' + typeof value);
+    pluginData[key] = value;
+  };
+  n.setRelaunchData = function (data) {
+    for (const k of Object.keys(data)) {
+      if (typeof data[k] !== 'string') throw new Error('setRelaunchData: description for "' + k + '" must be a string');
+      if (data[k].length > 1000) throw new Error('setRelaunchData: description for "' + k + '" exceeds 1000 characters');
+    }
+    n.relaunchData = data;
+  };
+
   // Enum-valued layout properties. The real API validates these and the values are easy to
   // mix up: STRETCH is a child's layoutAlign, never a parent's counterAxisAlignItems.
   const ENUMS = {
@@ -213,6 +229,11 @@ const figma = {
   ui: {
     postMessage: function (m) { if (m.type === 'log') process.stdout.write('   · ' + m.text.split('\n')[0] + '\n'); },
     onmessage: null,
+    resize: function (w, h) {
+      if (typeof w !== 'number' || typeof h !== 'number' || !(w > 0) || !(h > 0)) {
+        throw new Error('figma.ui.resize(' + w + ', ' + h + ') — needs two positive numbers');
+      }
+    },
   },
   showUI: function () {},
   closePlugin: function () {},

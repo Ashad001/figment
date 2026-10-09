@@ -6,8 +6,11 @@
   "ui": "ui.html",
   "editorType": ["figma"],
   "menu": [
-    { "name": "Build the screens", "command": "build" },
+    { "name": "Build", "command": "build" },
     { "name": "Dump this file's design system", "command": "dump" }
+  ],
+  "relaunchButtons": [
+    { "command": "build", "name": "Rebuild" }
   ],
   "networkAccess": { "allowedDomains": ["none"] }
 }

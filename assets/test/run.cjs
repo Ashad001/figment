@@ -12,17 +12,21 @@ const MIN_SCREENS = Number(process.env.MIN_SCREENS || 1);
 
 const code = fs.readFileSync(path.join(__dirname, '..', 'code.js'), 'utf8');
 const ctx = vm.createContext({ figma, __html__: '<html></html>', console, process, setTimeout, Promise });
+// The panel belongs to plugin/runner.js; a project bundle that opened its own would replace it.
+figma.showUI = function () { throw new Error('code.js called figma.showUI — only plugin/runner.js may'); };
 
 let failed = null;
 try {
   vm.runInContext(code, ctx, { filename: 'code.js' });
+  // code.js only defines things now. In Figma the runner calls build(), so the harness does here.
+  ctx.build().catch((e) => { failed = e; });
 } catch (e) {
   failed = e;
 }
 
-// The plugin's entry point is async, so give the microtask queue a turn before inspecting.
+// build() is async, so give the microtask queue a turn before inspecting.
 setTimeout(() => {
-  if (failed) { console.error('\nTHREW SYNCHRONOUSLY:\n', failed.stack); process.exit(1); }
+  if (failed) { console.error('\nTHREW:\n', failed.stack); process.exit(1); }
 
   const pages = root.children.map(p => p.name);
   const screensPage = root.children.find(p => p.name === 'Screens');

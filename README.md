@@ -63,6 +63,10 @@ cd assets && ./build.sh && node test/run.cjs
 # OK — 2 screen(s), no runtime errors, no layout overflow.
 ```
 
+`build.sh` also registers the project with the one Figment plugin in `~/.figment`. Import
+`~/.figment/plugin/manifest.json` into the Figma desktop app once, and every project you build
+shows up in it.
+
 ## Build order
 
 Each layer is consumed by the next, so out of order means rework.

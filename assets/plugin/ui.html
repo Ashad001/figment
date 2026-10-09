@@ -1,0 +1,116 @@
+<!doctype html>
+<meta charset="utf-8" />
+<style>
+  body { font: 12px/1.5 system-ui, -apple-system, sans-serif; margin: 0; padding: 12px;
+         background: var(--figma-color-bg, #ffffff); color: var(--figma-color-text, #1e1e1e); }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .muted { color: var(--figma-color-text-secondary, #6e6e6e); }
+  select, button, textarea { font: inherit; color: inherit; border-radius: 6px;
+         border: 1px solid var(--figma-color-border, #e6e6e6); background: var(--figma-color-bg, #ffffff); }
+  select { flex: 1; min-width: 0; padding: 4px 6px; }
+  button { padding: 5px 12px; cursor: pointer; }
+  button.primary { background: var(--figma-color-bg-brand, #0d99ff); color: var(--figma-color-text-onbrand, #ffffff);
+         border-color: transparent; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  #status { margin-bottom: 8px; }
+  #warn { display: none; padding: 8px 10px; border-radius: 6px; margin-bottom: 8px;
+          background: var(--figma-color-bg-warning-tertiary, #fff1e3); color: var(--figma-color-text-warning, #b35c00); }
+  #warn .row { margin: 8px 0 0; }
+  hr { border: 0; border-top: 1px solid var(--figma-color-border, #e6e6e6); margin: 10px 0; }
+  pre, textarea { font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  pre { white-space: pre-wrap; word-break: break-word; margin: 0; }
+  #dumpbox { display: none; margin-top: 10px; }
+  #dumpbox .row span { flex: 1; }
+  textarea { width: 100%; height: 300px; box-sizing: border-box; padding: 8px; resize: vertical;
+             background: var(--figma-color-bg-secondary, #f5f5f5); }
+</style>
+<div class="row">
+  <label for="project">Project</label>
+  <select id="project"></select>
+  <span id="age" class="muted"></span>
+</div>
+<div id="status" class="muted"></div>
+<div id="warn">
+  <div id="warntext"></div>
+  <div class="row"><button id="force" class="primary"></button><button id="cancel">Cancel</button></div>
+</div>
+<div class="row">
+  <button id="build" class="primary">Build</button>
+  <button id="dump">Dump design system</button>
+</div>
+<hr />
+<pre id="log"></pre>
+<div id="dumpbox">
+  <div class="row"><span class="muted">This file's design system, as JSON</span><button id="copy">Copy</button></div>
+  <textarea id="out" readonly></textarea>
+</div>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const send = (m) => parent.postMessage({ pluginMessage: m }, '*');
+  let projects = [];
+  let label = null;
+
+  function ago(iso) {
+    const s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000);
+    if (s < 60) return 'built just now';
+    if (s < 3600) return 'built ' + Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return 'built ' + Math.floor(s / 3600) + 'h ago';
+    return 'built ' + Math.floor(s / 86400) + 'd ago';
+  }
+
+  function showAge() {
+    const p = projects.find((p) => p.name === $('project').value);
+    $('age').textContent = p ? ago(p.builtAt) : '';
+  }
+
+  function showStatus() {
+    let text;
+    if (!projects.length) text = 'No projects registered — run ./build.sh in a project.';
+    else if (!label) text = 'New file — the first build labels it.';
+    else if (!projects.some((p) => p.name === label)) text = 'This file is ' + label + ', which isn\'t registered here — run ./build.sh in ' + label + '.';
+    else text = 'This file: ' + label;
+    $('status').textContent = text;
+  }
+
+  onmessage = (e) => {
+    const m = e.data.pluginMessage;
+    if (!m) return;
+    if (m.type === 'init') {
+      projects = m.projects;
+      label = m.label;
+      for (const p of projects) $('project').add(new Option(p.name, p.name, false, p.name === m.selected));
+      $('build').disabled = !projects.length;
+      showAge();
+      showStatus();
+    }
+    if (m.type === 'log') $('log').textContent = m.text;
+    if (m.type === 'busy') {
+      for (const id of ['build', 'dump', 'force']) $(id).disabled = m.busy;
+      if (!projects.length) $('build').disabled = true;
+    }
+    if (m.type === 'label') {
+      label = m.label;
+      $('warn').style.display = 'none';
+      showStatus();
+    }
+    if (m.type === 'confirm') {
+      $('warntext').textContent = '⚠ ' + (m.label ? 'This file is ' + m.label + '.' : 'This file already has Figment pages but no project label.') +
+        ' Building ' + m.project + ' here replaces its screens and overwrites its tokens.';
+      $('force').textContent = 'Build ' + m.project + ' anyway';
+      $('force').dataset.project = m.project;
+      $('warn').style.display = 'block';
+    }
+    if (m.type === 'dump') {
+      $('out').value = m.text;
+      $('dumpbox').style.display = 'block';
+      $('log').textContent = 'Design system dumped — press Copy.';
+    }
+  };
+
+  $('project').onchange = () => { showAge(); $('warn').style.display = 'none'; };
+  $('build').onclick = () => send({ type: 'build', project: $('project').value });
+  $('force').onclick = () => send({ type: 'build', project: $('force').dataset.project, force: true });
+  $('cancel').onclick = () => { $('warn').style.display = 'none'; };
+  $('dump').onclick = () => send({ type: 'dump' });
+  $('copy').onclick = () => { $('out').select(); document.execCommand('copy'); };
+</script>

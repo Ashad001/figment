@@ -1,16 +1,10 @@
 // Entry point.
 //
-// Two commands:
-//   build — regenerate the design system and every screen in whatever file this runs in
-//   dump  — read THIS file's design system out as JSON, for porting or for review
-
-figma.showUI(__html__, { width: 460, height: 520 });
+// build() regenerates the design system and every screen in whatever file this runs in.
+// Nothing here runs on load: plugin/runner.js owns the panel, the file's project label and the
+// dump command, and calls build() when this project is picked.
 
 function say(text) { figma.ui.postMessage({ type: 'log', text: text }); }
-
-figma.ui.onmessage = function (msg) {
-  if (msg && msg.type === 'close') figma.closePlugin();
-};
 
 /**
  * One table owns both the name and the position of every screen.
@@ -78,32 +72,3 @@ async function build() {
     ? 'Light and Dark — switch from the modes dropdown.'
     : 'Light only (a Starter plan allows one variable mode).'));
 }
-
-/** Read this file's design system out as JSON — how you port a system between files. */
-async function dump() {
-  const out = { collections: [], textStyles: [], paintStyles: [], components: [] };
-  const cols = await figma.variables.getLocalVariableCollectionsAsync();
-  for (const c of cols) {
-    const entry = { name: c.name, modes: c.modes.map(function (m) { return m.name; }), variables: [] };
-    for (const id of c.variableIds) {
-      const v = await figma.variables.getVariableByIdAsync(id);
-      if (!v) continue;
-      const values = {};
-      for (const m of c.modes) values[m.name] = v.valuesByMode[m.modeId];
-      entry.variables.push({ name: v.name, type: v.resolvedType, scopes: v.scopes, values: values });
-    }
-    out.collections.push(entry);
-  }
-  for (const s of await figma.getLocalTextStylesAsync()) {
-    out.textStyles.push({ name: s.name, font: s.fontName, size: s.fontSize, lineHeight: s.lineHeight, tracking: s.letterSpacing });
-  }
-  for (const s of await figma.getLocalPaintStylesAsync()) out.paintStyles.push({ name: s.name, paints: s.paints });
-  for (const p of figma.root.children) {
-    for (const n of p.children) if (n.type === 'COMPONENT' || n.type === 'COMPONENT_SET') out.components.push(n.name);
-  }
-  figma.ui.postMessage({ type: 'dump', text: JSON.stringify(out, null, 2) });
-}
-
-const COMMANDS = { build: build, dump: dump };
-const run = COMMANDS[figma.command] || build;
-run().catch(function (e) { say('Failed: ' + (e && e.message ? e.message : e) + '\n\n' + (e && e.stack ? e.stack : '')); });

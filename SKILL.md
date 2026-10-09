@@ -26,7 +26,7 @@ diffable, reviewable, regenerable, and correct by construction after the first t
 a bug.
 
 **The trade you are making:** a plugin runs in the Figma desktop app, so there is a human in
-the loop on every run (Plugins → Development → your plugin). You will not see the canvas.
+the loop on every run (one click: **Rebuild** in the right sidebar). You will not see the canvas.
 That sounds fatal and is not — see *The loop* below.
 
 ## Quick start
@@ -39,9 +39,13 @@ cd <repo>/tools/figma-plugin
 ./build.sh && node test/run.cjs        # should print: OK — 1 screen, no layout overflow
 ```
 
-Then in the **Figma desktop app** (not the browser — a manifest plugin needs desktop):
-Plugins → Development → Import plugin from manifest… → pick `manifest.json` →
-Plugins → Development → *your plugin* → Build.
+`build.sh` also registers the project with the one Figment plugin in `~/.figment`. In the
+**Figma desktop app** (not the browser — a manifest plugin needs desktop), import that plugin
+once, ever: Plugins → Development → Import plugin from manifest… →
+`~/.figment/plugin/manifest.json`. Then, in the project's own Figma file (one file per
+project): Plugins → Development → Figment → Build, pick the project, press **Build**. The
+first build labels the file; after that the plugin, or **Rebuild** in the right sidebar,
+rebuilds it in one click, and building another project into it asks first.
 
 Now start replacing the placeholder tokens with the real ones. Read `references/design-system.md`
 before you do.
