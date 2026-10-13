@@ -139,7 +139,7 @@ setTimeout(() => {
 
 - [ ] **Step 2: Run it and confirm it fails.**
 
-Run: `cd /Users/vyrom5/Documents/figment/assets && ./build.sh && node test/run.cjs`
+Run: `cd assets && ./build.sh && node test/run.cjs`
 (`build.sh` doesn't register anything yet in this task.)
 Expected: exit 1, printing `THREW:` and `code.js called figma.showUI — only plugin/runner.js may`.
 
@@ -182,7 +182,7 @@ function say(text) { figma.ui.postMessage({ type: 'log', text: text }); }
 
 - [ ] **Step 4: Run it and confirm it passes.**
 
-Run: `cd /Users/vyrom5/Documents/figment/assets && ./build.sh && node test/run.cjs`
+Run: `cd assets && ./build.sh && node test/run.cjs`
 Expected: exit 0; the last line is `OK — 2 screen(s), no runtime errors, no layout overflow.`
 
 - [ ] **Step 5: Report; don't commit.** Changed:
@@ -430,13 +430,13 @@ main()
 
 - [ ] **Step 3: Run it and confirm it fails.**
 
-Run: `cd /Users/vyrom5/Documents/figment/assets && ./build.sh && node test/runner.cjs`
+Run: `cd assets && ./build.sh && node test/runner.cjs`
 (`build.sh` doesn't call `register.mjs` yet, so it's still safe to run without `FIGMENT_HOME`.)
 Expected: exit 1 with `AssertionError … register a failed:` followed by `Cannot find module …/register.mjs`.
 
 - [ ] **Step 4: Move the plugin files and update the manifest.**
 
-Run: `cd /Users/vyrom5/Documents/figment/assets && mkdir plugin && mv manifest.json plugin/manifest.json && mv ui.html plugin/ui.html`
+Run: `cd assets && mkdir plugin && mv manifest.json plugin/manifest.json && mv ui.html plugin/ui.html`
 
 Then replace the entire contents of `assets/plugin/manifest.json` with:
 
@@ -674,7 +674,7 @@ node register.mjs
 - [ ] **Step 9: Run every check and confirm they pass.**
 
 Run (with `FH` exported as in *Global Constraints*):
-`cd /Users/vyrom5/Documents/figment/assets && FIGMENT_HOME=$FH ./build.sh && node test/run.cjs && node test/runner.cjs`
+`cd assets && FIGMENT_HOME=$FH ./build.sh && node test/run.cjs && node test/runner.cjs`
 
 Expected:
 - `build.sh` prints `built code.js — … bytes`, then `registered figment (1 project)` and the
@@ -826,7 +826,7 @@ Expected:
 ```
 
 - [ ] **Step 2: Check the panel in a browser.** Use the Playwright MCP tools.
-  - Navigate to `file:///Users/vyrom5/Documents/figment/assets/plugin/ui.html` and resize the
+  - Navigate to `file://<repo>/assets/plugin/ui.html` and resize the
     viewport to 460×300.
   - With `browser_evaluate`, run:
 
@@ -890,7 +890,7 @@ Expected:
 
 - [ ] **Step 3: Rebuild and rerun the checks.** `ui.html` gets copied into the install, so:
 
-Run: `cd /Users/vyrom5/Documents/figment/assets && FIGMENT_HOME=$FH ./build.sh && node test/run.cjs && node test/runner.cjs`
+Run: `cd assets && FIGMENT_HOME=$FH ./build.sh && node test/run.cjs && node test/runner.cjs`
 Expected: both `OK` lines, as in Task 2, Step 9.
 
 - [ ] **Step 4: Report; don't commit.** Changed:
@@ -914,7 +914,7 @@ Expected: both `OK` lines, as in Task 2, Step 9.
 - [ ] **Step 1: Write the failing check.** Run:
 
 ```bash
-cd /Users/vyrom5/Documents/figment && grep -n "pick \`manifest.json\`\|Build the screens\|your plugin\* → Build" SKILL.md README.md assets/README.md
+grep -n "pick \`manifest.json\`\|Build the screens\|your plugin\* → Build" SKILL.md README.md assets/README.md
 ```
 
 Expected: matches in `SKILL.md` and `assets/README.md`, which are the stale instructions.
@@ -1040,7 +1040,7 @@ shows up in it.
 - [ ] **Step 7: Run the check from Step 1 again, plus the full suite.**
 
 Run: the same `grep` as in Step 1. Expected: no output (exit 1).
-Run: `cd /Users/vyrom5/Documents/figment/assets && FIGMENT_HOME=$FH ./build.sh && node test/run.cjs && node test/runner.cjs`
+Run: `cd assets && FIGMENT_HOME=$FH ./build.sh && node test/run.cjs && node test/runner.cjs`
 Expected: both `OK` lines.
 
 - [ ] **Step 8: Report; don't commit.** Changed:
